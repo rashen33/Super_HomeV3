@@ -5,3 +5,4 @@ class Main {
         superHomeController.addComponent(new TV("TV"));
     }
 }
+

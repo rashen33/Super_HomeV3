@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-
 class TV implements Components{
     private JFrame frame;
     private JLabel statusLabel;
@@ -27,7 +26,6 @@ class TV implements Components{
         frame.add("Center",statusLabel);
 
         frame.setVisible(true);
-
     }
     @Override
     public void update(String status) {
@@ -38,7 +36,6 @@ class TV implements Components{
             statusLabel.setText("OFF");
             System.out.println("Update method TV");
         }
-
     }
     @Override
     public String getName() {

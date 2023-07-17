@@ -16,7 +16,6 @@ class SuperHomeController implements Components{  //Observer
     public int getNextIndex() {
         return nextIndex;
     }
-
     public String[] getListComponents() {
         String[] names = new String[nextIndex];
         for (int i = 0; i < nextIndex; i++) {
@@ -24,13 +23,15 @@ class SuperHomeController implements Components{  //Observer
         }
         return names;
     }
+    public Components getComponent(int index){
+        return compArray[index];
+    }
 
     @Override
     public void update(String status) {
         this.status = status;
         notifyComponents();
     }
-
     @Override
     public String getName() {
         return null;

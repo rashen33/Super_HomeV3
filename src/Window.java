@@ -2,16 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-class TV implements Components{
+class Window implements Components{
     private JFrame frame;
     private JLabel statusLabel;
 
-    TV(String name){
+    Window(String name){
         frame = new JFrame();
         frame.setSize(250,100);
         frame.setTitle(name);
         frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        frame.setLocation(1000,100);
+        frame.setLocationRelativeTo(null);
+        frame.setLocation(400,300);
+
 
         statusLabel = new JLabel();
         statusLabel.setText("OFF");
@@ -25,10 +27,10 @@ class TV implements Components{
     public void update(String status) {
         if(status.equals("ON")){
             statusLabel.setText("ON");
-            System.out.println("Update method TV");
+            System.out.println("Update method Window");
         }else{
             statusLabel.setText("OFF");
-            System.out.println("Update method TV");
+            System.out.println("Update method Window");
         }
     }
     @Override
@@ -38,8 +40,10 @@ class TV implements Components{
 
     @Override
     public void setTime(String startHours, String startMinutes, String endHours, String endMinutes) {
-        System.out.println("start hours : " + startHours + " end minutes : " + endMinutes + " end  hours : " + endHours + " end mins : " + endMinutes);
+
     }
 
 
 }
+
+

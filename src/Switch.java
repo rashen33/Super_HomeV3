@@ -24,13 +24,18 @@ class Switch implements Components {
     private JSpinner StartMinutesSpinner;
     private JSpinner EndMinutesSpinner;
     private JSpinner EndHoursSpinner;
-    private JSpinner hoursSpinnerSwitch;
-    private JSpinner minutesSpinnerSwitch;
 
-    private JList<String> timeList;
-    private DefaultListModel<String> timeListModel;
+    private JList<TimeComp> timeList;
+    private DefaultListModel<TimeComp> timeListModel;
+    private TimeComp timeComp;
+//    private List<TimeComp> timeComponents;
+    private SuperHomeController superHomeController;
 
     Switch(SuperHomeController superHomeController, String name) {
+        this.superHomeController = superHomeController;
+
+//        timeComponents = new ArrayList<>();
+
         frame = new JFrame();
         frame.setSize(300, 150);
         frame.setTitle(name);
@@ -67,91 +72,78 @@ class Switch implements Components {
                 settingsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 settingsFrame.setLocationRelativeTo(null);
 
+                JPanel settingsPanel = new JPanel(new BorderLayout());
+
                 componentListModel = new DefaultListModel<>();
                 componentList = new JList<>(componentListModel);
 
-                String[] listNames = superHomeController.getListComponents(); //Getting all the names from the components that has been created in the Main class.
+                String[] listNames = superHomeController.getListComponents();
                 for (int i = 0; i < superHomeController.getNextIndex(); i++) {
-                    componentListModel.addElement(listNames[i]); //Adding the names to the componentListModel
+                    componentListModel.addElement(listNames[i]);
                 }
 
                 componentList.addListSelectionListener(new ListSelectionListener() {
                     @Override
                     public void valueChanged(ListSelectionEvent e) {
                         if (!e.getValueIsAdjusting()) {
-                            String selectedComponent = componentList.getSelectedValue(); //Taking the name of the selected component from the JList (Controller JLISt)
+                            String selectedComponent = componentList.getSelectedValue();
                             if (selectedComponent != null) {
-                                //----------Creating a JFrame (controller window) to the selected component
                                 JFrame selectedFrame = new JFrame();
                                 selectedFrame.setSize(550, 300);
                                 selectedFrame.setTitle(selectedComponent);
 
-                                //--------------------Top panel has the JList----------------------
+                                int selectedIndex = componentListModel.indexOf(selectedComponent);
+                                superHomeController.setSelectedIndex(selectedIndex);
+                                System.out.println("Selected compoennt : " + selectedIndex);// index of the selected Component
+
                                 JPanel topPanel = new JPanel(new BorderLayout());
 
                                 timeListModel = new DefaultListModel<>();
                                 timeList = new JList<>(timeListModel);
 
-                                topPanel.add("Center",timeList);
-                                selectedFrame.add("North",topPanel);
+                                topPanel.add(timeList, BorderLayout.CENTER);
+                                selectedFrame.add(topPanel, BorderLayout.NORTH);
 
-                                //------------Bottom panel with the start time end time JSpinners and Set JButton--------------
                                 JPanel bottomPanel = new JPanel(new FlowLayout());
 
                                 StartHoursLabel = new JLabel("Start: Hours");
-                                StartHoursSpinner = createSpinner(0, 23, 1, 0, 2); //Passing the values to create the JSpinner to createSpinner method
-
+                                StartHoursSpinner = createSpinner(0, 23, 1, 0, 2);
 
                                 StartMinutesLabel = new JLabel("Minutes");
                                 StartMinutesSpinner = createSpinner(0, 59, 1, 0, 2);
 
-
                                 EndHoursLabel = new JLabel("End: Hours");
                                 EndHoursSpinner = createSpinner(0, 23, 1, 0, 2);
-
 
                                 EndMinutesLabel = new JLabel("Minutes");
                                 EndMinutesSpinner = createSpinner(0, 59, 1, 0, 2);
 
-
-                                //Adding all the JSpinners and JLabels to the bottom panel
                                 bottomPanel.add(StartHoursLabel);
                                 bottomPanel.add(StartHoursSpinner);
                                 bottomPanel.add(StartMinutesLabel);
                                 bottomPanel.add(StartMinutesSpinner);
-
                                 bottomPanel.add(EndHoursLabel);
                                 bottomPanel.add(EndHoursSpinner);
                                 bottomPanel.add(EndMinutesLabel);
                                 bottomPanel.add(EndMinutesSpinner);
 
-                                //----The "Set" button as function button-----
                                 functionButton = new JButton("Set");
-//                                functionButton.addActionListener(new ActionListener() {
-//                                    public void actionPerformed(ActionEvent evt) {
-//                                        int selectedIndex = componentListModel.indexOf(selectedComponent); //index of the selected Component
-//                                        System.out.println("index of the element " + selectedIndex);
-//                                        int startHour = (int) StartHoursSpinner.getValue();
-//                                        int startMinutes = (int) StartMinutesSpinner.getValue();
-//                                        int endHour = (int) EndHoursSpinner.getValue();
-//                                        int endMinutes = (int) EndMinutesSpinner.getValue();
-//
-//                                        //---------------Time from the Switch timer------------------
-//                                        int startHourSwitch = (int) hoursSpinnerSwitch.getValue();
-//                                        int startMinutesSwitch = (int) minutesSpinnerSwitch.getValue();
-//
-//                                        String setTime = "Starts at : " + startHour + ":" + startMinutes + "  Ends at : " + endHour + ":" + endMinutes;
-//                                        timeListModel.addElement(setTime);
-//                                        TimeComps timeComps = new TimeComps(startHour,startMinutes,endHour,endMinutes,startHourSwitch,startMinutesSwitch);
-//
-//
-//                                        System.out.println(startHourSwitch + " " + startMinutesSwitch);
-//                                    }
-//                                });
+                                functionButton.addActionListener(new ActionListener() {
+                                    public void actionPerformed(ActionEvent evt) {
+
+                                        String startHours = "" + StartHoursSpinner.getValue();
+                                        String startMinutes = "" + StartMinutesSpinner.getValue();
+                                        String endHours = "" + EndHoursSpinner.getValue();
+                                        String endMinutes = "" + EndMinutesSpinner.getValue();
+                                        timeListModel.addElement(new TimeComp(startHours, startMinutes, endHours, endMinutes));
+                                        superHomeController.setTime(startHours, startMinutes, endHours, endMinutes);
+                                    }
+                                });
+
                                 functionButton.setFont(new Font("", 1, 20));
                                 bottomPanel.add(functionButton);
 
-                                selectedFrame.add("South",bottomPanel);
+                                selectedFrame.add(bottomPanel, BorderLayout.SOUTH);
 
                                 selectedFrame.setLocationRelativeTo(null);
                                 selectedFrame.setVisible(true);
@@ -160,7 +152,10 @@ class Switch implements Components {
                     }
                 });
 
-                settingsFrame.add(componentList);
+                JScrollPane componentScrollPane = new JScrollPane(componentList);
+                settingsPanel.add(componentScrollPane, BorderLayout.CENTER);
+
+                settingsFrame.add(settingsPanel);
                 settingsFrame.setVisible(true);
             }
         });
@@ -169,7 +164,6 @@ class Switch implements Components {
 
         frame.add("North", topPanel);
 
-        //--------------Bottom Panel of the Switch main window with the JSpinners-----------------
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
@@ -183,28 +177,74 @@ class Switch implements Components {
         bottomPanel.add(hoursSpinner);
         bottomPanel.add(minutesLabel);
         bottomPanel.add(minutesSpinner);
-        //topPanel.add(bottomPanelSwitch);
 
-        frame.add("North",topPanel); //Consisting the power button and the settings button
-        frame.add("South", bottomPanel);//Consisting the two JSpinners
+        frame.add("South", bottomPanel);
 
         frame.setVisible(true);
     }
+
     private JSpinner createSpinner(int min, int max, int step, int initialValue, int digits) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(initialValue, min, max, step);
         JSpinner spinner = new JSpinner(spinnerModel);
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner, "00"); //To format the number
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner, "00");
         editor.getTextField().setColumns(digits);
         spinner.setEditor(editor);
         return spinner;
     }
+
+    private String formatTime(int hour, int minute) {
+        return String.format("%02d:%02d", hour, minute);
+    }
+
+//    private boolean isWithinTimeRange(int currentHours, int currentMinutes) {
+//        int selectedIndex = componentListModel.indexOf(frame.getTitle());
+//        for (TimeComp timeComp : timeComponents) {
+//            if (timeComp.getSelectedIndex() == selectedIndex) {
+//                int startHours = timeComp.getStartHours();
+//                int startMinutes = timeComp.getStartMinutes();
+//                int endHours = timeComp.getEndHours();
+//                int endMinutes = timeComp.getEndMinutes();
+//
+//                if (currentHours > startHours && currentHours < endHours) {
+//                    return true;
+//                }
+//                if (currentHours == startHours && currentMinutes >= startMinutes) {
+//                    return true;
+//                }
+//                if (currentHours == endHours && currentMinutes <= endMinutes) {
+//                    return true;
+//                }
+//                if (startHours > endHours) {
+//                    if (currentHours > startHours || currentHours < endHours) {
+//                        return true;
+//                    }
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
+    private void updateComponentStatus(String status) {
+        int selectedIndex = componentListModel.indexOf(frame.getTitle());
+        if (selectedIndex != -1) {
+            superHomeController.sendUpdateComponent(status, selectedIndex);
+        }
+    }
+
     @Override
     public void update(String status) {
         this.status = status;
         System.out.println("Update method Switch");
     }
+
     @Override
     public String getName() {
         return frame.getTitle();
     }
+
+    @Override
+    public void setTime(String startHours, String startMinutes, String endHours, String endMinutes) {
+
+    }
+
 }

@@ -1,23 +1,17 @@
-import javax.swing.*;
-
 class SuperHomeController implements Components{  //Observer
     private Components[] compArray = new Components[100];
     private int nextIndex;
     private String status;
     private int selectedIndex;
-    private String startHours;
-    private String startMinutes;
-    private String endHours;
-    private String endMinutes;
+    private int startHours;
+    private int startMinutes;
+    private int endHours;
+    private int endMinutes;
 
     public void addComponent(Components ob) {
         compArray[nextIndex++] = ob;
     }
-    public void notifyComponents() {
-        for (int i = 1; i < nextIndex; i++) {
-            compArray[i].update(status);
-        }
-    }
+
     public int getNextIndex() {
         return nextIndex;
     }
@@ -28,29 +22,18 @@ class SuperHomeController implements Components{  //Observer
         }
         return names;
     }
-    public Components getComponent(int index){
-        return compArray[index];
-    }
-//    public void sendUpdateComponent(String status,String name){
-//        for (int i = 1; i < nextIndex; i++){
-//            if (compArray[i].getName().equals(name)){
-//                compArray[i].update(status);
-//            }
-//        }
-//    }
-
-    public void sendUpdateComponent(String status,int index){
-        compArray[index].update(status);
-    }
     public void setSelectedIndex(int selectedIndex){
         if(this.selectedIndex != selectedIndex){
             this.selectedIndex = selectedIndex;
         }
     }
-    public  void notifyByIndex(){
-            compArray[selectedIndex].setTime(startHours,startMinutes,endHours,endMinutes);
+    public void updateCompStatus(String status){
+        compArray[selectedIndex].update(status);
     }
-    public void setTime(String startHours,String startMinutes,String endHours,String endMinutes){
+    public  void notifyByIndex(){
+        compArray[selectedIndex].setTime(startHours,startMinutes,endHours,endMinutes);
+    }
+    public void setTime(int startHours,int startMinutes,int endHours,int endMinutes){
         if( this.startHours!=startHours || this.startMinutes!=startMinutes || this.endHours!=endHours || this.endMinutes!=endMinutes){
             this.startHours = startHours;
             this.startMinutes = startMinutes;
@@ -60,14 +43,40 @@ class SuperHomeController implements Components{  //Observer
         }
 
     }
-
+    public void notifyComponents() {
+        for (int i = 1; i < nextIndex; i++) {
+            compArray[i].update(status);
+        }
+    }
     @Override
     public void update(String status) {
-        this.status = status;
-        notifyComponents();
+        if(this.status!=status){
+            this.status = status;
+            notifyComponents();
+        }
     }
     @Override
     public String getName() {
         return null;
+    }
+
+    @Override
+    public int getStartHours() {
+        return startHours;
+    }
+
+    @Override
+    public int getStartMinutes() {
+        return startMinutes;
+    }
+
+    @Override
+    public int getEndHours() {
+        return endHours;
+    }
+
+    @Override
+    public int getEndMinutes() {
+        return endMinutes;
     }
 }

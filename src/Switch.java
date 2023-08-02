@@ -1,8 +1,11 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 class Switch implements Components {
     private JFrame frame;
@@ -28,13 +31,10 @@ class Switch implements Components {
     private JList<TimeComp> timeList;
     private DefaultListModel<TimeComp> timeListModel;
     private TimeComp timeComp;
-//    private List<TimeComp> timeComponents;
     private SuperHomeController superHomeController;
 
     Switch(SuperHomeController superHomeController, String name) {
         this.superHomeController = superHomeController;
-
-//        timeComponents = new ArrayList<>();
 
         frame = new JFrame();
         frame.setSize(300, 150);
@@ -94,7 +94,7 @@ class Switch implements Components {
 
                                 int selectedIndex = componentListModel.indexOf(selectedComponent);
                                 superHomeController.setSelectedIndex(selectedIndex);
-                                System.out.println("Selected compoennt : " + selectedIndex);// index of the selected Component
+                                System.out.println("Selected component: " + selectedIndex);// index of the selected Component
 
                                 JPanel topPanel = new JPanel(new BorderLayout());
 
@@ -130,21 +130,18 @@ class Switch implements Components {
                                 functionButton = new JButton("Set");
                                 functionButton.addActionListener(new ActionListener() {
                                     public void actionPerformed(ActionEvent evt) {
-
-                                        String startHours = "" + StartHoursSpinner.getValue();
-                                        String startMinutes = "" + StartMinutesSpinner.getValue();
-                                        String endHours = "" + EndHoursSpinner.getValue();
-                                        String endMinutes = "" + EndMinutesSpinner.getValue();
+                                        int startHours = (int) StartHoursSpinner.getValue();
+                                        int startMinutes = (int) StartMinutesSpinner.getValue();
+                                        int endHours = (int) EndHoursSpinner.getValue();
+                                        int endMinutes = (int) EndMinutesSpinner.getValue();
                                         timeListModel.addElement(new TimeComp(startHours, startMinutes, endHours, endMinutes));
                                         superHomeController.setTime(startHours, startMinutes, endHours, endMinutes);
                                     }
                                 });
-
                                 functionButton.setFont(new Font("", 1, 20));
                                 bottomPanel.add(functionButton);
 
                                 selectedFrame.add(bottomPanel, BorderLayout.SOUTH);
-
                                 selectedFrame.setLocationRelativeTo(null);
                                 selectedFrame.setVisible(true);
                             }
@@ -161,7 +158,6 @@ class Switch implements Components {
         });
         settingsButton.setFont(new Font("", 1, 20));
         topPanel.add(settingsButton);
-
         frame.add("North", topPanel);
 
         JPanel bottomPanel = new JPanel();
@@ -169,6 +165,34 @@ class Switch implements Components {
 
         hoursLabel = new JLabel("Hours");
         hoursSpinner = createSpinner(0, 23, 1, 0, 2);
+        ChangeListener hoursChangeListener = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int currentHours = (int) hoursSpinner.getValue();
+                int currentMinutes = (int) minutesSpinner.getValue();
+                System.out.println("Current Hours: " + currentHours);
+                System.out.println("Current Minutes: " + currentMinutes);
+
+                // Access start and end time from the selected component
+                int startHours = superHomeController.getStartHours();
+                int startMinutes = superHomeController.getStartMinutes();
+                int endHours = superHomeController.getEndHours();
+                int endMinutes = superHomeController.getEndMinutes();
+                System.out.println("Start Time: " + startHours + ":" + startMinutes);
+                System.out.println("End Time: " + endHours + ":" + endMinutes);
+
+                // Compare with the selected component's start and end time
+                if (currentHours >= startHours && currentHours <= endHours) {
+                    status = "OFF";
+                    System.out.println("OFF");
+                } else {
+                    status = "ON";
+                    System.out.println("ON");
+                }
+                superHomeController.updateCompStatus(status);
+            }
+        };
+        hoursSpinner.addChangeListener(hoursChangeListener);
 
         minutesLabel = new JLabel("Minutes");
         minutesSpinner = createSpinner(0, 59, 1, 0, 2);
@@ -182,7 +206,6 @@ class Switch implements Components {
 
         frame.setVisible(true);
     }
-
     private JSpinner createSpinner(int min, int max, int step, int initialValue, int digits) {
         SpinnerModel spinnerModel = new SpinnerNumberModel(initialValue, min, max, step);
         JSpinner spinner = new JSpinner(spinnerModel);
@@ -194,41 +217,6 @@ class Switch implements Components {
 
     private String formatTime(int hour, int minute) {
         return String.format("%02d:%02d", hour, minute);
-    }
-
-//    private boolean isWithinTimeRange(int currentHours, int currentMinutes) {
-//        int selectedIndex = componentListModel.indexOf(frame.getTitle());
-//        for (TimeComp timeComp : timeComponents) {
-//            if (timeComp.getSelectedIndex() == selectedIndex) {
-//                int startHours = timeComp.getStartHours();
-//                int startMinutes = timeComp.getStartMinutes();
-//                int endHours = timeComp.getEndHours();
-//                int endMinutes = timeComp.getEndMinutes();
-//
-//                if (currentHours > startHours && currentHours < endHours) {
-//                    return true;
-//                }
-//                if (currentHours == startHours && currentMinutes >= startMinutes) {
-//                    return true;
-//                }
-//                if (currentHours == endHours && currentMinutes <= endMinutes) {
-//                    return true;
-//                }
-//                if (startHours > endHours) {
-//                    if (currentHours > startHours || currentHours < endHours) {
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
-    private void updateComponentStatus(String status) {
-        int selectedIndex = componentListModel.indexOf(frame.getTitle());
-        if (selectedIndex != -1) {
-            superHomeController.sendUpdateComponent(status, selectedIndex);
-        }
     }
 
     @Override
@@ -243,8 +231,26 @@ class Switch implements Components {
     }
 
     @Override
-    public void setTime(String startHours, String startMinutes, String endHours, String endMinutes) {
-
+    public void setTime(int startHours, int startMinutes, int endHours, int endMinutes) {
     }
 
+    @Override
+    public int getStartHours() {
+        return 0;
+    }
+
+    @Override
+    public int getStartMinutes() {
+        return 0;
+    }
+
+    @Override
+    public int getEndHours() {
+        return 0;
+    }
+
+    @Override
+    public int getEndMinutes() {
+        return 0;
+    }
 }

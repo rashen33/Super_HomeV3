@@ -39,8 +39,28 @@ class Window implements Components{
     }
 
     @Override
-    public void setTime(String startHours, String startMinutes, String endHours, String endMinutes) {
+    public void setTime(int startHours, int startMinutes, int endHours, int endMinutes) {
 
+    }
+
+    @Override
+    public int getStartHours() {
+        return 0;
+    }
+
+    @Override
+    public int getStartMinutes() {
+        return 0;
+    }
+
+    @Override
+    public int getEndHours() {
+        return 0;
+    }
+
+    @Override
+    public int getEndMinutes() {
+        return 0;
     }
 
 

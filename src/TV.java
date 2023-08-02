@@ -37,8 +37,28 @@ class TV implements Components{
     }
 
     @Override
-    public void setTime(String startHours, String startMinutes, String endHours, String endMinutes) {
-        System.out.println("start hours : " + startHours + " end minutes : " + endMinutes + " end  hours : " + endHours + " end mins : " + endMinutes);
+    public void setTime(int startHours, int startMinutes, int endHours, int endMinutes) {
+        System.out.println("Start hours" + startHours);
+    }
+
+    @Override
+    public int getStartHours() {
+        return 0;
+    }
+
+    @Override
+    public int getStartMinutes() {
+        return 0;
+    }
+
+    @Override
+    public int getEndHours() {
+        return 0;
+    }
+
+    @Override
+    public int getEndMinutes() {
+        return 0;
     }
 
 

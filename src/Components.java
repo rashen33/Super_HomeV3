@@ -1,5 +1,9 @@
 interface Components {
-    public void update(String status);
-    public String getName();
-    public void setTime(String startHours, String startMinutes, String endHours, String endMinutes);
+    void update(String status);
+    String getName();
+    void setTime(int startHours, int startMinutes, int endHours, int endMinutes);
+    int getStartHours();
+    int getStartMinutes();
+    int getEndHours();
+    int getEndMinutes();
 }
